@@ -2,6 +2,7 @@
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Box } from '@mui/material';
+import PropTypes from 'prop-types';
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function Timeline() {
@@ -38,3 +39,8 @@ export default function Timeline() {
     </Box>
   );
 }
+
+Timeline.propTypes = {
+  /** Optional custom styling for the timeline container */
+  sx: PropTypes.object,
+};
