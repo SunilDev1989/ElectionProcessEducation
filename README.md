@@ -73,3 +73,12 @@ The platform is divided into four core educational pillars:
 - **Google Generative AI (Gemini/Gemma):** Heavily integrated as the backbone of the Voter Assistant (Live Q&A with Search Grounding) and the Election Pulse (Live Sentiment Analysis).
 - **Google Maps (vis.gl):** Integrated via `@vis.gl/react-google-maps` to power the Civic Map functionality, helping users locate their polling stations.
 - **Google Analytics:** Natively integrated into the Next.js App Router layout for telemetry tracking.
+
+### 7.🛠️ Installation & Setup
+Clone the repo: git clone ...
+
+Install dependencies: npm install
+
+Set up .env with GOOGLE_GENAI_API_KEY.
+
+Run locally: npm run dev
