@@ -1,5 +1,14 @@
 import { NextResponse } from 'next/server';
 
+/**
+ * Handles incoming chat requests, processes prompt wrapping security, and executes a resilient model cascade.
+ * 
+ * @async
+ * @function POST
+ * @param {Request} req - The standard Next.js API Request object containing the JSON payload.
+ * @returns {Promise<NextResponse>} Returns a JSON response containing the AI reply or an error message.
+ * @throws {Error} Throws an error if all models in the cascade fail or rate limits are exceeded.
+ */
 export async function POST(req) {
   try {
     const { messages, modelId = "gemini-3.1-flash-lite-preview", language = "English" } = await req.json();

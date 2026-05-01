@@ -1,14 +1,26 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Box, TextField, IconButton, Typography, Avatar, CircularProgress, Select, MenuItem, FormControl, Chip, Tooltip } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PersonIcon from '@mui/icons-material/Person';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import ThumbUpAltOutlinedIcon from '@mui/icons-material/ThumbUpAltOutlined';
+import ThumbDownAltOutlinedIcon from '@mui/icons-material/ThumbDownAltOutlined';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import ReactMarkdown from 'react-markdown';
 import { useLanguage } from '@/context/LanguageContext';
+import { db } from '@/lib/firebase';
+import { collection, addDoc } from 'firebase/firestore';
 
+/**
+ * Interactive Voter Education Assistant Component.
+ * Implements a resilient model cascade and client-side PII scrubbing.
+ * 
+ * @returns {JSX.Element} The rendered ChatBot interface.
+ */
 export default function ChatBot() {
   const defaultMessages = [
     { role: 'assistant', content: 'Namaste! I am your Voter Education Guide. Ask me anything about the voting process, registration deadlines, or how to find your polling place!' }
@@ -20,12 +32,13 @@ export default function ChatBot() {
   const { language, t } = useLanguage();
   const [selectedModel, setSelectedModel] = useState('gemma-2-2b-it');
   const messagesEndRef = useRef(null);
+  const [feedbackState, setFeedbackState] = useState({});
 
-  const SUGGESTED_PROMPTS = [
+  const SUGGESTED_PROMPTS = useMemo(() => [
     "How do I register to vote?",
     "What is an EVM?",
     "Elections in 2026?"
-  ];
+  ], []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -35,19 +48,66 @@ export default function ChatBot() {
     scrollToBottom();
   }, [messages, isLoading]);
 
-  const clearChat = () => {
+  /**
+   * Clears the current chat history and resets state.
+   */
+  const clearChat = useCallback(() => {
     setMessages(defaultMessages);
     setInput('');
-  };
+    setFeedbackState({});
+  }, [defaultMessages]);
 
-  const containsPII = (text) => {
+  /**
+   * Pushes user feedback to the Firestore database for analysis.
+   * 
+   * @param {number} index - Index of the message in the array.
+   * @param {boolean} isHelpful - Whether the user gave a thumbs up or down.
+   */
+  const handleFeedback = useCallback(async (index, isHelpful) => {
+    if (feedbackState[index]) return; // Prevent multiple clicks
+
+    // Optimistic UI Update
+    setFeedbackState(prev => ({ ...prev, [index]: isHelpful ? 'up' : 'down' }));
+
+    try {
+      // Find the user's question directly preceding this answer
+      let question = "Unknown";
+      if (index > 0 && messages[index - 1].role === 'user') {
+        question = messages[index - 1].content;
+      }
+
+      // Actively push functional data to Firebase Firestore
+      await addDoc(collection(db, 'ai_feedback'), {
+        question: question,
+        answer: messages[index].content,
+        isHelpful: isHelpful,
+        language: language,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Firestore Error: ", error);
+    }
+  }, [feedbackState, messages, language]);
+
+  /**
+   * Scans user input for sensitive PII (Aadhar/PAN) before sending to the backend.
+   * 
+   * @param {string} text - The raw user input.
+   * @returns {boolean} True if PII is detected, false otherwise.
+   */
+  const containsPII = useCallback((text) => {
     // Basic regex for 12 digit numbers (Aadhar) or 10 char alphanumeric (PAN)
     const aadharRegex = /\b\d{4}\s?\d{4}\s?\d{4}\b/;
     const panRegex = /\b[A-Z]{5}[0-9]{4}[A-Z]{1}\b/i;
     return aadharRegex.test(text) || panRegex.test(text);
-  };
+  }, []);
 
-  const handleSend = async (textToSend = input) => {
+  /**
+   * Submits the user's message to the backend model cascade logic.
+   * 
+   * @param {string} [textToSend=input] - The message to send. Defaults to current input state.
+   */
+  const handleSend = useCallback(async (textToSend = input) => {
     if (!textToSend.trim() || isLoading) return;
     
     // Security Check: Client-Side PII Scrubber
@@ -90,7 +150,7 @@ export default function ChatBot() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [input, isLoading, messages, selectedModel, language, containsPII]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', bgcolor: 'transparent' }}>
@@ -165,6 +225,32 @@ export default function ChatBot() {
               ) : (
                 <Box sx={{ typography: 'body1', fontSize: '0.95rem', lineHeight: 1.7 }}>
                   <ReactMarkdown>{msg.content}</ReactMarkdown>
+                </Box>
+              )}
+              
+              {/* Feedback Module */}
+              {msg.role === 'assistant' && i > 0 && (
+                <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: 1, gap: 1, borderTop: '1px solid #e0e0e0', pt: 1 }}>
+                  <Tooltip title="Helpful">
+                    <IconButton 
+                      size="small" 
+                      onClick={() => handleFeedback(i, true)}
+                      disabled={!!feedbackState[i]}
+                      sx={{ color: feedbackState[i] === 'up' ? 'primary.main' : 'text.disabled' }}
+                    >
+                      {feedbackState[i] === 'up' ? <ThumbUpIcon fontSize="small" /> : <ThumbUpAltOutlinedIcon fontSize="small" />}
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Not Helpful">
+                    <IconButton 
+                      size="small" 
+                      onClick={() => handleFeedback(i, false)}
+                      disabled={!!feedbackState[i]}
+                      sx={{ color: feedbackState[i] === 'down' ? 'error.main' : 'text.disabled' }}
+                    >
+                      {feedbackState[i] === 'down' ? <ThumbDownIcon fontSize="small" /> : <ThumbDownAltOutlinedIcon fontSize="small" />}
+                    </IconButton>
+                  </Tooltip>
                 </Box>
               )}
             </Box>
