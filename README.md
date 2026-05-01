@@ -2,6 +2,7 @@
 
 🚀 **Live Demo:** [https://voter-intelligence-platform-634124330346.asia-south1.run.app](https://voter-intelligence-platform-634124330346.asia-south1.run.app)
 
+**Recording Link :** https://www.loom.com/share/f5d5d9902f334f21b9528c07cd20c000
 
 A comprehensive **Voter Education Assistance** platform built for the Hack2Skill demonstration, designed to demystify the Indian electoral process, educate citizens, and gamify civic engagement using advanced AI.
 
