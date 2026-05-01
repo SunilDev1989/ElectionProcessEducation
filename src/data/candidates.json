@@ -1,0 +1,72 @@
+[
+  {
+    "id": "cand_001",
+    "name": "Rahul Gandhi",
+    "party": "Indian National Congress (INC)",
+    "constituency": "Wayanad",
+    "state": "Kerala",
+    "education": "M.Phil (Development Studies)",
+    "assets": 203800000,
+    "liabilities": 4900000,
+    "criminal_cases": 18,
+    "attendance": 51,
+    "debates": 6,
+    "questions": 0
+  },
+  {
+    "id": "cand_002",
+    "name": "Narendra Modi",
+    "party": "Bharatiya Janata Party (BJP)",
+    "constituency": "Varanasi",
+    "state": "Uttar Pradesh",
+    "education": "Post Graduate",
+    "assets": 30200000,
+    "liabilities": 0,
+    "criminal_cases": 0,
+    "attendance": null,
+    "debates": null,
+    "questions": null
+  },
+  {
+    "id": "cand_003",
+    "name": "Akhilesh Yadav",
+    "party": "Samajwadi Party (SP)",
+    "constituency": "Kannauj",
+    "state": "Uttar Pradesh",
+    "education": "Master of Environmental Engineering",
+    "assets": 421000000,
+    "liabilities": 5000000,
+    "criminal_cases": 0,
+    "attendance": 58,
+    "debates": 1,
+    "questions": 0
+  },
+  {
+    "id": "cand_004",
+    "name": "Asaduddin Owaisi",
+    "party": "All India Majlis-E-Ittehadul Muslimeen (AIMIM)",
+    "constituency": "Hyderabad",
+    "state": "Telangana",
+    "education": "Bar-At-Law",
+    "assets": 238000000,
+    "liabilities": 70000000,
+    "criminal_cases": 5,
+    "attendance": 81,
+    "debates": 62,
+    "questions": 343
+  },
+  {
+    "id": "cand_005",
+    "name": "Supriya Sule",
+    "party": "Nationalist Congress Party (NCP)",
+    "constituency": "Baramati",
+    "state": "Maharashtra",
+    "education": "B.Sc (Microbiology)",
+    "assets": 1665000000,
+    "liabilities": 35000000,
+    "criminal_cases": 0,
+    "attendance": 93,
+    "debates": 152,
+    "questions": 612
+  }
+]
