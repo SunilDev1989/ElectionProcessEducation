@@ -1,7 +1,7 @@
 # Voter Intelligence Platform 🇮🇳
 
 🚀 **Live Demo:** [https://voter-intelligence-platform-634124330346.asia-south1.run.app](https://voter-intelligence-platform-634124330346.asia-south1.run.app)
-💻 **GitHub Repository:** [Insert Your GitHub Link Here]
+
 
 A comprehensive **Voter Education Assistance** platform built for the Hack2Skill demonstration, designed to demystify the Indian electoral process, educate citizens, and gamify civic engagement using advanced AI.
 
